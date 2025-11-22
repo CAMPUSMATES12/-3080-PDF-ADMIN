@@ -9,7 +9,6 @@
 <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
 
 <style>
-  /* GENERAL STYLES */
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body {
     font-family: Arial, sans-serif;
@@ -17,7 +16,6 @@
     color: #333;
   }
 
-  /* HEADER */
   header {
     background: linear-gradient(to right, #0a8f3f, #21b04c);
     color: white;
@@ -38,7 +36,6 @@
     object-fit: contain;
   }
 
-  /* MAIN CONTAINER */
   .container {
     max-width: 900px;
     margin: 30px auto;
@@ -63,10 +60,6 @@
     border-radius: 6px;
     border: 1px solid #ccc;
     font-size: 14px;
-  }
-
-  input[type="file"] {
-    padding: 6px;
   }
 
   button {
@@ -95,7 +88,6 @@
     text-align: center;
   }
 
-  /* FOOTER NOTE */
   .note {
     margin-top: 20px;
     font-size: 14px;
@@ -131,30 +123,40 @@
   <select id="fileType">
     <option value="pdfs">Course Documents</option>
     <option value="notes">Course Notes</option>
-    <option value="videos">Course Videos (YouTube links)</option>
+    <option value="videos">Course Videos (YouTube Links)</option>
     <option value="resources">Course Resources</option>
   </select>
 
-  <label for="fileInput">Choose File</label>
+  <!-- YOUTUBE LINK INPUT (Hidden until selected) -->
+  <div id="ytSection" style="display:none;">
+    <label>YouTube Video Title</label>
+    <input type="text" id="videoTitle" placeholder="Example: Introduction to Chemistry">
+
+    <label>YouTube Link</label>
+    <input type="text" id="youtubeLink" placeholder="https://youtube.com/...">
+  </div>
+
+  <!-- NORMAL FILE INPUT -->
+  <label for="fileInput" id="fileLabel">Choose File</label>
   <input type="file" id="fileInput">
 
   <button id="uploadBtn">Upload File</button>
 
   <div class="success-msg" id="successMsg">File uploaded successfully!</div>
 
-  <p class="note">Note: For videos, upload a `.txt` file containing the YouTube link.</p>
+  <p class="note">For videos, enter a YouTube link above. A .txt file will be automatically created.</p>
+
 </div>
 
 <!-- SUPABASE JS -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <script>
-  // 🔹 CHANGE THESE ONLY
   const SUPABASE_URL = "https://vtpsruejncfykiazrfsx.supabase.co";
-  const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZ0cHNydWVqbmNmeWtpYXpyZnN4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTY3NDA5NzQsImV4cCI6MjA3MjMxNjk3NH0.UV55gbsSAgnyolxJhIYTaJUpvoJFsJn0_-LMNwhwAK0";
+  const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZ0cHNydWVqbmNmeWtpYXpyZnN4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTY3NDA5NzQsImV4cCI6MjA3MjMxNjk3NH0.UV55gbsSAgnyolxJhIYTaJUpvoJFsJn0_-LMNwhwAK0"; 
   const BUCKET = "uploads";
 
-  const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+  const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
   const uploadBtn = document.getElementById("uploadBtn");
   const courseCode = document.getElementById("courseCode");
@@ -162,19 +164,55 @@
   const fileInput = document.getElementById("fileInput");
   const successMsg = document.getElementById("successMsg");
 
+  // YouTube fields
+  const ytSection = document.getElementById("ytSection");
+  const videoTitle = document.getElementById("videoTitle");
+  const youtubeLink = document.getElementById("youtubeLink");
+
+  fileType.addEventListener("change", () => {
+    if (fileType.value === "videos") {
+      ytSection.style.display = "block";
+      fileInput.style.display = "none";
+      document.getElementById("fileLabel").style.display = "none";
+    } else {
+      ytSection.style.display = "none";
+      fileInput.style.display = "block";
+      document.getElementById("fileLabel").style.display = "block";
+    }
+  });
+
   uploadBtn.addEventListener("click", async () => {
-    const file = fileInput.files[0];
-    if (!file) {
-      alert("Please select a file to upload!");
-      return;
+    let path;
+    let uploadData;
+
+    if (fileType.value === "videos") {
+      if (!videoTitle.value.trim() || !youtubeLink.value.trim()) {
+        alert("Enter video title and YouTube link!");
+        return;
+      }
+
+      const fileContent = youtubeLink.value.trim();
+      const blob = new Blob([fileContent], { type: "text/plain" });
+
+      path = `${courseCode.value}/videos/${videoTitle.value}.txt`;
+      uploadData = blob;
+
+    } else {
+      const file = fileInput.files[0];
+      if (!file) {
+        alert("Please select a file to upload!");
+        return;
+      }
+
+      path = `${courseCode.value}/${fileType.value}/${file.name}`;
+      uploadData = file;
     }
 
-    const path = `${courseCode.value}/${fileType.value}/${file.name}`;
-
     try {
-      const { data, error } = await supabase.storage
+      const { error } = await supabaseClient
+        .storage
         .from(BUCKET)
-        .upload(path, file, { upsert: true });
+        .upload(path, uploadData, { upsert: true });
 
       if (error) throw error;
 
@@ -182,6 +220,9 @@
       setTimeout(() => successMsg.style.display = "none", 3000);
 
       fileInput.value = "";
+      youtubeLink.value = "";
+      videoTitle.value = "";
+
     } catch (err) {
       alert("Upload failed: " + err.message);
       console.error(err);
