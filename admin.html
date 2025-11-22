@@ -62,6 +62,11 @@
     font-size: 14px;
   }
 
+  textarea {
+    resize: vertical;
+    min-height: 80px;
+  }
+
   button {
     background: #0b923f;
     color: white;
@@ -105,19 +110,24 @@
 </header>
 
 <div class="container">
-  <h2>Upload Course Files</h2>
+  <h2>Manage Course</h2>
 
-  <label for="courseCode">Select Course</label>
-  <select id="courseCode">
-    <option value="CHM101">CHM101</option>
-    <option value="BIO101">BIO101</option>
-    <option value="COS101">COS101</option>
-    <option value="PHY101">PHY101</option>
-    <option value="GNS101">GNS101/103</option>
-    <option value="MTH101">MTH101/105</option>
-    <option value="MTH211">MTH211</option>
-    <option value="BCH201">BCH/BCM201</option>
-  </select>
+  <!-- Course Details -->
+  <label for="courseCode">Course Code</label>
+  <input type="text" id="courseCode" placeholder="Example: CHM101">
+
+  <label for="courseTitle">Course Title</label>
+  <input type="text" id="courseTitleInput" placeholder="Example: Introduction to Chemistry">
+
+  <label for="courseDesc">Course Description</label>
+  <textarea id="courseDescInput" placeholder="Enter course description here..."></textarea>
+
+  <button id="saveCourseBtn">Save Course Details</button>
+  <div class="success-msg" id="courseSuccessMsg">Course saved successfully!</div>
+
+  <hr style="margin:30px 0;">
+
+  <h2>Upload Course Files</h2>
 
   <label for="fileType">File Type</label>
   <select id="fileType">
@@ -152,82 +162,109 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <script>
-  const SUPABASE_URL = "https://vtpsruejncfykiazrfsx.supabase.co";
-  const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZ0cHNydWVqbmNmeWtpYXpyZnN4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTY3NDA5NzQsImV4cCI6MjA3MjMxNjk3NH0.UV55gbsSAgnyolxJhIYTaJUpvoJFsJn0_-LMNwhwAK0"; 
-  const BUCKET = "uploads";
+const SUPABASE_URL = "https://vtpsruejncfykiazrfsx.supabase.co";
+const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZ0cHNydWVqbmNmeWtpYXpyZnN4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTY3NDA5NzQsImV4cCI6MjA3MjMxNjk3NH0.UV55gbsSAgnyolxJhIYTaJUpvoJFsJn0_-LMNwhwAK0"; 
+const BUCKET = "uploads";
 
-  const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-  const uploadBtn = document.getElementById("uploadBtn");
-  const courseCode = document.getElementById("courseCode");
-  const fileType = document.getElementById("fileType");
-  const fileInput = document.getElementById("fileInput");
-  const successMsg = document.getElementById("successMsg");
+const uploadBtn = document.getElementById("uploadBtn");
+const fileType = document.getElementById("fileType");
+const fileInput = document.getElementById("fileInput");
+const successMsg = document.getElementById("successMsg");
 
-  // YouTube fields
-  const ytSection = document.getElementById("ytSection");
-  const videoTitle = document.getElementById("videoTitle");
-  const youtubeLink = document.getElementById("youtubeLink");
+// Course fields
+const courseCodeInput = document.getElementById("courseCode");
+const courseTitleInput = document.getElementById("courseTitleInput");
+const courseDescInput = document.getElementById("courseDescInput");
+const saveCourseBtn = document.getElementById("saveCourseBtn");
+const courseSuccessMsg = document.getElementById("courseSuccessMsg");
 
-  fileType.addEventListener("change", () => {
-    if (fileType.value === "videos") {
-      ytSection.style.display = "block";
-      fileInput.style.display = "none";
-      document.getElementById("fileLabel").style.display = "none";
-    } else {
-      ytSection.style.display = "none";
-      fileInput.style.display = "block";
-      document.getElementById("fileLabel").style.display = "block";
+// YouTube fields
+const ytSection = document.getElementById("ytSection");
+const videoTitle = document.getElementById("videoTitle");
+const youtubeLink = document.getElementById("youtubeLink");
+
+fileType.addEventListener("change", () => {
+  if (fileType.value === "videos") {
+    ytSection.style.display = "block";
+    fileInput.style.display = "none";
+    document.getElementById("fileLabel").style.display = "none";
+  } else {
+    ytSection.style.display = "none";
+    fileInput.style.display = "block";
+    document.getElementById("fileLabel").style.display = "block";
+  }
+});
+
+// ===== Save Course Details =====
+saveCourseBtn.addEventListener("click", async () => {
+  const code = courseCodeInput.value.trim();
+  const title = courseTitleInput.value.trim();
+  const desc = courseDescInput.value.trim();
+
+  if (!code || !title || !desc) {
+    alert("Please fill in all course details!");
+    return;
+  }
+
+  try {
+    const { error } = await supabaseClient
+      .from("courses")
+      .upsert([{ code: code, title: title, description: desc }], { onConflict: "code" });
+
+    if (error) throw error;
+
+    courseSuccessMsg.style.display = "block";
+    setTimeout(() => courseSuccessMsg.style.display = "none", 3000);
+  } catch (err) {
+    alert("Failed to save course: " + err.message);
+    console.error(err);
+  }
+});
+
+// ===== Upload Files =====
+uploadBtn.addEventListener("click", async () => {
+  const course = courseCodeInput.value.trim();
+  if (!course) { alert("Enter course code!"); return; }
+
+  let path;
+  let uploadData;
+
+  if (fileType.value === "videos") {
+    if (!videoTitle.value.trim() || !youtubeLink.value.trim()) {
+      alert("Enter video title and YouTube link!");
+      return;
     }
-  });
+    const blob = new Blob([youtubeLink.value.trim()], { type: "text/plain" });
+    path = `${course}/videos/${videoTitle.value}.txt`;
+    uploadData = blob;
+  } else {
+    const file = fileInput.files[0];
+    if (!file) { alert("Please select a file to upload!"); return; }
+    path = `${course}/${fileType.value}/${file.name}`;
+    uploadData = file;
+  }
 
-  uploadBtn.addEventListener("click", async () => {
-    let path;
-    let uploadData;
+  try {
+    const { error } = await supabaseClient
+      .storage
+      .from(BUCKET)
+      .upload(path, uploadData, { upsert: true });
 
-    if (fileType.value === "videos") {
-      if (!videoTitle.value.trim() || !youtubeLink.value.trim()) {
-        alert("Enter video title and YouTube link!");
-        return;
-      }
+    if (error) throw error;
 
-      const fileContent = youtubeLink.value.trim();
-      const blob = new Blob([fileContent], { type: "text/plain" });
+    successMsg.style.display = "block";
+    setTimeout(() => successMsg.style.display = "none", 3000);
 
-      path = `${courseCode.value}/videos/${videoTitle.value}.txt`;
-      uploadData = blob;
-
-    } else {
-      const file = fileInput.files[0];
-      if (!file) {
-        alert("Please select a file to upload!");
-        return;
-      }
-
-      path = `${courseCode.value}/${fileType.value}/${file.name}`;
-      uploadData = file;
-    }
-
-    try {
-      const { error } = await supabaseClient
-        .storage
-        .from(BUCKET)
-        .upload(path, uploadData, { upsert: true });
-
-      if (error) throw error;
-
-      successMsg.style.display = "block";
-      setTimeout(() => successMsg.style.display = "none", 3000);
-
-      fileInput.value = "";
-      youtubeLink.value = "";
-      videoTitle.value = "";
-
-    } catch (err) {
-      alert("Upload failed: " + err.message);
-      console.error(err);
-    }
-  });
+    fileInput.value = "";
+    videoTitle.value = "";
+    youtubeLink.value = "";
+  } catch (err) {
+    alert("Upload failed: " + err.message);
+    console.error(err);
+  }
+});
 </script>
 
 </body>
