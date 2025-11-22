@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>👀3080 PDF Admin Panel</title>
+
+<!-- Google Icons -->
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+
+<style>
+  /* GENERAL STYLES */
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: Arial, sans-serif;
+    background: #f5f7fb;
+    color: #333;
+  }
+
+  /* HEADER */
+  header {
+    background: linear-gradient(to right, #0a8f3f, #21b04c);
+    color: white;
+    padding: 15px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  header h1 {
+    font-size: 24px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  header h1 img {
+    width: 40px;
+    height: 40px;
+    object-fit: contain;
+  }
+
+  /* MAIN CONTAINER */
+  .container {
+    max-width: 900px;
+    margin: 30px auto;
+    background: white;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+  }
+
+  h2 { color: #0b923f; margin-bottom: 20px; }
+
+  label {
+    display: block;
+    margin: 12px 0 6px;
+    font-weight: bold;
+  }
+
+  input, select, textarea {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 18px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    font-size: 14px;
+  }
+
+  input[type="file"] {
+    padding: 6px;
+  }
+
+  button {
+    background: #0b923f;
+    color: white;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: 0.2s;
+  }
+  button:hover {
+    background: #158b39;
+  }
+
+  .success-msg {
+    background: #e1f7e7;
+    border: 1px solid #0b923f;
+    padding: 12px;
+    border-radius: 8px;
+    margin-top: 15px;
+    color: #0b923f;
+    display: none;
+    font-weight: bold;
+    text-align: center;
+  }
+
+  /* FOOTER NOTE */
+  .note {
+    margin-top: 20px;
+    font-size: 14px;
+    color: #555;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>
+    <img src="https://vtpsruejncfykiazrfsx.supabase.co/storage/v1/object/public/PRODUCTS/EYES%20OF%203080%20logo" alt="Logo">
+    👀3080 PDF Admin Panel
+  </h1>
+</header>
+
+<div class="container">
+  <h2>Upload Course Files</h2>
+
+  <label for="courseCode">Select Course</label>
+  <select id="courseCode">
+    <option value="CHM101">CHM101</option>
+    <option value="BIO101">BIO101</option>
+    <option value="COS101">COS101</option>
+    <option value="PHY101">PHY101</option>
+    <option value="GNS101">GNS101/103</option>
+    <option value="MTH101">MTH101/105</option>
+    <option value="MTH211">MTH211</option>
+    <option value="BCH201">BCH/BCM201</option>
+  </select>
+
+  <label for="fileType">File Type</label>
+  <select id="fileType">
+    <option value="pdfs">Course Documents</option>
+    <option value="notes">Course Notes</option>
+    <option value="videos">Course Videos (YouTube links)</option>
+    <option value="resources">Course Resources</option>
+  </select>
+
+  <label for="fileInput">Choose File</label>
+  <input type="file" id="fileInput">
+
+  <button id="uploadBtn">Upload File</button>
+
+  <div class="success-msg" id="successMsg">File uploaded successfully!</div>
+
+  <p class="note">Note: For videos, upload a `.txt` file containing the YouTube link.</p>
+</div>
+
+<!-- SUPABASE JS -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script>
+  // 🔹 CHANGE THESE ONLY
+  const SUPABASE_URL = "https://vtpsruejncfykiazrfsx.supabase.co";
+  const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZ0cHNydWVqbmNmeWtpYXpyZnN4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTY3NDA5NzQsImV4cCI6MjA3MjMxNjk3NH0.UV55gbsSAgnyolxJhIYTaJUpvoJFsJn0_-LMNwhwAK0";
+  const BUCKET = "uploads";
+
+  const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+  const uploadBtn = document.getElementById("uploadBtn");
+  const courseCode = document.getElementById("courseCode");
+  const fileType = document.getElementById("fileType");
+  const fileInput = document.getElementById("fileInput");
+  const successMsg = document.getElementById("successMsg");
+
+  uploadBtn.addEventListener("click", async () => {
+    const file = fileInput.files[0];
+    if (!file) {
+      alert("Please select a file to upload!");
+      return;
+    }
+
+    const path = `${courseCode.value}/${fileType.value}/${file.name}`;
+
+    try {
+      const { data, error } = await supabase.storage
+        .from(BUCKET)
+        .upload(path, file, { upsert: true });
+
+      if (error) throw error;
+
+      successMsg.style.display = "block";
+      setTimeout(() => successMsg.style.display = "none", 3000);
+
+      fileInput.value = "";
+    } catch (err) {
+      alert("Upload failed: " + err.message);
+      console.error(err);
+    }
+  });
+</script>
+
+</body>
+</html>
