@@ -98,6 +98,14 @@
     font-size: 14px;
     color: #555;
   }
+
+  /* Thumbnail preview styling */
+  #ytSection img {
+    display: block;
+    margin-top: 10px;
+    width: 320px;
+    border-radius: 6px;
+  }
 </style>
 </head>
 <body>
@@ -138,12 +146,17 @@
   </select>
 
   <!-- YOUTUBE LINK INPUT (Hidden until selected) -->
-  <div id="ytSection" style="display:none;">
-    <label>YouTube Video Title</label>
-    <input type="text" id="videoTitle" placeholder="Example: Introduction to Chemistry">
+  <div id="ytSection" style="display:none; margin-top: 15px;">
+    <label for="videoTitle">YouTube Video Title</label>
+    <input type="text" id="videoTitle" placeholder="Enter video title, e.g., Introduction to Chemistry">
 
-    <label>YouTube Link</label>
-    <input type="text" id="youtubeLink" placeholder="https://youtube.com/...">
+    <label for="youtubeLink">YouTube Video Link</label>
+    <input type="url" id="youtubeLink" placeholder="Enter full YouTube link, e.g., https://www.youtube.com/watch?v=VIDEO_ID">
+
+    <small>Make sure to enter the full YouTube URL. The thumbnail will be generated automatically.</small>
+
+    <!-- Thumbnail preview -->
+    <img id="ytThumbPreview" src="" alt="YouTube Thumbnail" style="display:none;">
   </div>
 
   <!-- NORMAL FILE INPUT -->
@@ -151,10 +164,7 @@
   <input type="file" id="fileInput">
 
   <button id="uploadBtn">Upload File</button>
-
   <div class="success-msg" id="successMsg">File uploaded successfully!</div>
-
-  <p class="note">For videos, enter a YouTube link above. A .txt file will be automatically created.</p>
 
 </div>
 
@@ -171,6 +181,7 @@ const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 const uploadBtn = document.getElementById("uploadBtn");
 const fileType = document.getElementById("fileType");
 const fileInput = document.getElementById("fileInput");
+const fileLabel = document.getElementById("fileLabel");
 const successMsg = document.getElementById("successMsg");
 
 // Course fields
@@ -184,16 +195,40 @@ const courseSuccessMsg = document.getElementById("courseSuccessMsg");
 const ytSection = document.getElementById("ytSection");
 const videoTitle = document.getElementById("videoTitle");
 const youtubeLink = document.getElementById("youtubeLink");
+const ytThumbPreview = document.getElementById("ytThumbPreview");
 
+// Show/hide YouTube or file upload based on fileType selection
 fileType.addEventListener("change", () => {
   if (fileType.value === "videos") {
     ytSection.style.display = "block";
     fileInput.style.display = "none";
-    document.getElementById("fileLabel").style.display = "none";
+    fileLabel.style.display = "none";
   } else {
     ytSection.style.display = "none";
     fileInput.style.display = "block";
-    document.getElementById("fileLabel").style.display = "block";
+    fileLabel.style.display = "block";
+    ytThumbPreview.style.display = "none";
+  }
+});
+
+// Generate thumbnail preview when YouTube link is entered
+youtubeLink.addEventListener("input", () => {
+  const url = youtubeLink.value.trim();
+  if (url) {
+    try {
+      const urlObj = new URL(url);
+      const videoId = urlObj.searchParams.get("v");
+      if (videoId) {
+        ytThumbPreview.src = `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
+        ytThumbPreview.style.display = "block";
+      } else {
+        ytThumbPreview.style.display = "none";
+      }
+    } catch {
+      ytThumbPreview.style.display = "none";
+    }
+  } else {
+    ytThumbPreview.style.display = "none";
   }
 });
 
@@ -236,6 +271,7 @@ uploadBtn.addEventListener("click", async () => {
       alert("Enter video title and YouTube link!");
       return;
     }
+    // Store YouTube link as TXT in Supabase
     const blob = new Blob([youtubeLink.value.trim()], { type: "text/plain" });
     path = `${course}/videos/${videoTitle.value}.txt`;
     uploadData = blob;
@@ -260,6 +296,7 @@ uploadBtn.addEventListener("click", async () => {
     fileInput.value = "";
     videoTitle.value = "";
     youtubeLink.value = "";
+    ytThumbPreview.style.display = "none";
   } catch (err) {
     alert("Upload failed: " + err.message);
     console.error(err);
