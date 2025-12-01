@@ -166,6 +166,28 @@
   <button id="uploadBtn">Upload File</button>
   <div class="success-msg" id="successMsg">File uploaded successfully!</div>
 
+  <hr style="margin:30px 0;">
+
+  <!-- ⭐⭐ UPDATED: POST UPDATES / NEWS SECTION ⭐⭐ -->
+  <h2>Post Updates / News</h2>
+
+  <label>Update Title</label>
+  <input type="text" id="newsTitle" placeholder="Enter title">
+
+  <label>Update Body</label>
+  <textarea id="newsBody" placeholder="Write update content..."></textarea>
+
+  <label>Optional Image</label>
+  <input type="file" id="newsImage">
+
+  <!-- Image preview -->
+  <img id="newsImagePreview" src="" alt="Preview" style="display:none; max-width:300px; margin-top:10px; border-radius:6px;">
+
+  <button id="postNewsBtn">Post Update</button>
+  <div class="success-msg" id="newsSuccessMsg">Update posted successfully!</div>
+
+  <!-- Live preview of posted update -->
+  <div id="newsPreviewContainer" style="margin-top:20px;"></div>
 </div>
 
 <!-- SUPABASE JS -->
@@ -176,8 +198,10 @@ const SUPABASE_URL = "https://zvnovocoayqomdilidte.supabase.co";
 const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp2bm92b2NvYXlxb21kaWxpZHRlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQwMDM2OTgsImV4cCI6MjA3OTU3OTY5OH0.PcpwASQ3RBRoQVIglxKz-yM3iuYMZMtyQJBh8QNHad8"; 
 const BUCKET = "uploads";
 
+// Define Supabase client
 const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
+// ===== Elements =====
 const uploadBtn = document.getElementById("uploadBtn");
 const fileType = document.getElementById("fileType");
 const fileInput = document.getElementById("fileInput");
@@ -197,7 +221,11 @@ const videoTitle = document.getElementById("videoTitle");
 const youtubeLink = document.getElementById("youtubeLink");
 const ytThumbPreview = document.getElementById("ytThumbPreview");
 
-// Show/hide YouTube or file upload based on fileType selection
+// News fields
+const newsImageInput = document.getElementById("newsImage");
+const newsImagePreview = document.getElementById("newsImagePreview");
+
+// ===== Show/hide YouTube or file upload based on fileType =====
 fileType.addEventListener("change", () => {
   if (fileType.value === "videos") {
     ytSection.style.display = "block";
@@ -211,7 +239,7 @@ fileType.addEventListener("change", () => {
   }
 });
 
-// Generate thumbnail preview when YouTube link is entered
+// ===== Generate YouTube thumbnail preview =====
 youtubeLink.addEventListener("input", () => {
   const url = youtubeLink.value.trim();
   if (url) {
@@ -302,7 +330,82 @@ uploadBtn.addEventListener("click", async () => {
     console.error(err);
   }
 });
+
+// ===== News Image Preview =====
+newsImageInput.addEventListener("change", () => {
+  const file = newsImageInput.files[0];
+  if (file) {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      newsImagePreview.src = e.target.result;
+      newsImagePreview.style.display = "block";
+    };
+    reader.readAsDataURL(file);
+  } else {
+    newsImagePreview.src = "";
+    newsImagePreview.style.display = "none";
+  }
+});
+
+// ===== Post Update / News =====
+document.getElementById("postNewsBtn").addEventListener("click", async () => {
+  const title = document.getElementById("newsTitle").value.trim();
+  const body = document.getElementById("newsBody").value.trim();
+  const imageFile = newsImageInput.files[0];
+
+  if (!title || !body) {
+    alert("Please enter both title and body.");
+    return;
+  }
+
+  let imageUrl = null;
+
+  try {
+    if (imageFile) {
+      const imgPath = `news/${Date.now()}_${imageFile.name}`;
+      const { error: uploadError } = await supabaseClient.storage.from(BUCKET).upload(imgPath, imageFile, { upsert: true });
+      if (uploadError) throw uploadError;
+
+      const { data: publicUrl } = supabaseClient.storage.from(BUCKET).getPublicUrl(imgPath);
+      imageUrl = publicUrl.publicUrl;
+    }
+
+    const { error } = await supabaseClient.from("updates").insert([
+      { title: title, body: body, image: imageUrl }
+    ]);
+    if (error) throw error;
+
+    // Show success message
+    document.getElementById("newsSuccessMsg").style.display = "block";
+    setTimeout(() => document.getElementById("newsSuccessMsg").style.display = "none", 3000);
+
+    // Clear inputs
+    document.getElementById("newsTitle").value = "";
+    document.getElementById("newsBody").value = "";
+    newsImageInput.value = "";
+    newsImagePreview.style.display = "none";
+
+    // Show live preview
+    const previewContainer = document.getElementById("newsPreviewContainer");
+    const postDiv = document.createElement("div");
+    postDiv.style.border = "1px solid #ccc";
+    postDiv.style.padding = "12px";
+    postDiv.style.borderRadius = "8px";
+    postDiv.style.marginBottom = "15px";
+    postDiv.innerHTML = `
+      <h3 style="margin-bottom:6px;">${title}</h3>
+      <p>${body}</p>
+      ${imageUrl ? `<img src="${imageUrl}" style="max-width:100%; border-radius:6px; margin-top:10px;">` : ""}
+    `;
+    previewContainer.prepend(postDiv);
+
+  } catch (err) {
+    alert("Failed to post update: " + err.message);
+    console.error(err);
+  }
+});
 </script>
 
 </body>
 </html>
+
