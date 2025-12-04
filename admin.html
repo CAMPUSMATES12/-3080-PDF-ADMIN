@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
+<meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>👀3080 PDF Admin Panel</title>
 
@@ -17,7 +17,7 @@
   }
 
   header {
-    background: linear-gradient(to right, #0a8f3f, #21b04c);
+    background: linear-gradient(to right, #003c94, #0056d2); /* royal blue */
     color: white;
     padding: 15px 20px;
     display: flex;
@@ -28,84 +28,114 @@
     font-size: 24px;
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 12px;
   }
   header h1 img {
     width: 40px;
     height: 40px;
     object-fit: contain;
+    border-radius: 6px;
+    background: rgba(255,255,255,0.06);
   }
 
   .container {
-    max-width: 900px;
-    margin: 30px auto;
+    max-width: 980px;
+    margin: 28px auto;
     background: white;
-    padding: 30px;
+    padding: 28px;
     border-radius: 12px;
-    box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.06);
   }
 
-  h2 { color: #0b923f; margin-bottom: 20px; }
+  h2 { color: #003c94; margin-bottom: 16px; }
 
   label {
     display: block;
     margin: 12px 0 6px;
-    font-weight: bold;
+    font-weight: 700;
+    color: #1b3b6f;
   }
 
   input, select, textarea {
     width: 100%;
     padding: 12px;
-    margin-bottom: 18px;
-    border-radius: 6px;
-    border: 1px solid #ccc;
+    margin-bottom: 14px;
+    border-radius: 8px;
+    border: 1px solid #d7e2fb;
     font-size: 14px;
+    background: #fbfdff;
   }
 
   textarea {
     resize: vertical;
-    min-height: 80px;
+    min-height: 90px;
   }
 
   button {
-    background: #0b923f;
+    background: linear-gradient(90deg,#0056d2,#0078ff);
     color: white;
     padding: 12px 20px;
     border: none;
     border-radius: 8px;
     cursor: pointer;
-    font-size: 16px;
-    transition: 0.2s;
+    font-size: 15px;
+    transition: transform .12s ease, box-shadow .12s ease;
   }
   button:hover {
-    background: #158b39;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(0,88,210,0.18);
   }
 
   .success-msg {
-    background: #e1f7e7;
-    border: 1px solid #0b923f;
+    background: #e8f1ff;
+    border: 1px solid #0056d2;
     padding: 12px;
     border-radius: 8px;
-    margin-top: 15px;
-    color: #0b923f;
+    margin-top: 12px;
+    color: #003c94;
     display: none;
-    font-weight: bold;
+    font-weight: 700;
     text-align: center;
   }
 
   .note {
-    margin-top: 20px;
-    font-size: 14px;
-    color: #555;
+    margin-top: 12px;
+    font-size: 13px;
+    color: #445d89;
   }
 
   /* Thumbnail preview styling */
-  #ytSection img {
+  #ytSection img, #newsImagePreview {
     display: block;
     margin-top: 10px;
     width: 320px;
-    border-radius: 6px;
+    border-radius: 8px;
+    border: 1px solid #e6f0ff;
   }
+
+  hr.separator {
+    border: none;
+    height: 1px;
+    background: linear-gradient(to right, rgba(0,0,0,0), rgba(0,0,0,0.06), rgba(0,0,0,0));
+    margin: 24px 0;
+  }
+
+  /* Live preview container */
+  #newsPreviewContainer .post-preview {
+    border-radius: 10px;
+    border: 1px solid #e6f0ff;
+    padding: 14px;
+    margin-top: 12px;
+    background: #fbfdff;
+  }
+  #newsPreviewContainer .post-preview h3 { color:#003c94; margin-bottom:8px; }
+  #newsPreviewContainer .post-preview img { max-width:100%; border-radius:8px; margin-top:10px; }
+
+  /* small helpers */
+  .inline-row { display:flex; gap:12px; flex-wrap:wrap; align-items:center; }
+  .inline-row .half { flex:1 1 48%; }
+  @media (max-width:720px){ .inline-row .half{ flex-basis:100%; } }
+
 </style>
 </head>
 <body>
@@ -115,6 +145,7 @@
     <img src="https://vtpsruejncfykiazrfsx.supabase.co/storage/v1/object/public/PRODUCTS/EYES%20OF%203080%20logo" alt="Logo">
     👀3080 PDF Admin Panel
   </h1>
+  <div style="font-weight:700; color: #dbe9ff;">Admin</div>
 </header>
 
 <div class="container">
@@ -130,10 +161,12 @@
   <label for="courseDesc">Course Description</label>
   <textarea id="courseDescInput" placeholder="Enter course description here..."></textarea>
 
-  <button id="saveCourseBtn">Save Course Details</button>
-  <div class="success-msg" id="courseSuccessMsg">Course saved successfully!</div>
+  <div style="display:flex; gap:12px; align-items:center;">
+    <button id="saveCourseBtn">Save Course Details</button>
+    <div class="success-msg" id="courseSuccessMsg">Course saved successfully!</div>
+  </div>
 
-  <hr style="margin:30px 0;">
+  <hr class="separator">
 
   <h2>Upload Course Files</h2>
 
@@ -146,14 +179,14 @@
   </select>
 
   <!-- YOUTUBE LINK INPUT (Hidden until selected) -->
-  <div id="ytSection" style="display:none; margin-top: 15px;">
+  <div id="ytSection" style="display:none; margin-top: 8px;">
     <label for="videoTitle">YouTube Video Title</label>
     <input type="text" id="videoTitle" placeholder="Enter video title, e.g., Introduction to Chemistry">
 
     <label for="youtubeLink">YouTube Video Link</label>
     <input type="url" id="youtubeLink" placeholder="Enter full YouTube link, e.g., https://www.youtube.com/watch?v=VIDEO_ID">
 
-    <small>Make sure to enter the full YouTube URL. The thumbnail will be generated automatically.</small>
+    <small class="note">Make sure to enter the full YouTube URL. The thumbnail will be generated automatically.</small>
 
     <!-- Thumbnail preview -->
     <img id="ytThumbPreview" src="" alt="YouTube Thumbnail" style="display:none;">
@@ -163,28 +196,40 @@
   <label for="fileInput" id="fileLabel">Choose File</label>
   <input type="file" id="fileInput">
 
-  <button id="uploadBtn">Upload File</button>
-  <div class="success-msg" id="successMsg">File uploaded successfully!</div>
+  <div style="display:flex; gap:12px; align-items:center;">
+    <button id="uploadBtn">Upload File</button>
+    <div class="success-msg" id="successMsg">File uploaded successfully!</div>
+  </div>
 
-  <hr style="margin:30px 0;">
+  <hr class="separator">
 
   <!-- ⭐⭐ UPDATED: POST UPDATES / NEWS SECTION ⭐⭐ -->
   <h2>Post Updates / News</h2>
 
   <label>Update Title</label>
-  <input type="text" id="newsTitle" placeholder="Enter title">
+  <input type="text" id="newsTitle" placeholder="Enter title (short & clear)">
 
-  <label>Update Body</label>
+  <label>Update Body (you can include links, emails, phone numbers)</label>
   <textarea id="newsBody" placeholder="Write update content..."></textarea>
 
-  <label>Optional Image</label>
-  <input type="file" id="newsImage">
+  <div class="inline-row" style="margin-bottom:10px;">
+    <div class="half">
+      <label>Optional Image</label>
+      <input type="file" id="newsImage" accept="image/*">
+    </div>
+    <div class="half">
+      <label>Optional Category (e.g., General, 100-level)</label>
+      <input type="text" id="newsCategory" placeholder="e.g., General or 100-level">
+    </div>
+  </div>
 
   <!-- Image preview -->
   <img id="newsImagePreview" src="" alt="Preview" style="display:none; max-width:300px; margin-top:10px; border-radius:6px;">
 
-  <button id="postNewsBtn">Post Update</button>
-  <div class="success-msg" id="newsSuccessMsg">Update posted successfully!</div>
+  <div style="display:flex; gap:12px; align-items:center; margin-top:10px;">
+    <button id="postNewsBtn">Post Update</button>
+    <div class="success-msg" id="newsSuccessMsg">Update posted successfully!</div>
+  </div>
 
   <!-- Live preview of posted update -->
   <div id="newsPreviewContainer" style="margin-top:20px;"></div>
@@ -194,14 +239,14 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <script>
+/* ===== CONFIG ===== */
 const SUPABASE_URL = "https://zvnovocoayqomdilidte.supabase.co";
-const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp2bm92b2NvYXlxb21kaWxpZHRlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQwMDM2OTgsImV4cCI6MjA3OTU3OTY5OH0.PcpwASQ3RBRoQVIglxKz-yM3iuYMZMtyQJBh8QNHad8"; 
+const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp2bm92b2NvYXlxb21kaWxpZHRlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQwMDM2OTgsImV4cCI6MjA3OTU3OTY5OH0.PcpwASQ3RBRoQVIglxKz-yM3iuYMZMtyQJBh8QNHad8";
 const BUCKET = "uploads";
 
-// Define Supabase client
 const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-// ===== Elements =====
+/* ===== ELEMENTS ===== */
 const uploadBtn = document.getElementById("uploadBtn");
 const fileType = document.getElementById("fileType");
 const fileInput = document.getElementById("fileInput");
@@ -224,8 +269,14 @@ const ytThumbPreview = document.getElementById("ytThumbPreview");
 // News fields
 const newsImageInput = document.getElementById("newsImage");
 const newsImagePreview = document.getElementById("newsImagePreview");
+const newsTitleInput = document.getElementById("newsTitle");
+const newsBodyInput = document.getElementById("newsBody");
+const postNewsBtn = document.getElementById("postNewsBtn");
+const newsSuccessMsg = document.getElementById("newsSuccessMsg");
+const newsPreviewContainer = document.getElementById("newsPreviewContainer");
+const newsCategoryInput = document.getElementById("newsCategory");
 
-// ===== Show/hide YouTube or file upload based on fileType =====
+/* ===== UI Behavior ===== */
 fileType.addEventListener("change", () => {
   if (fileType.value === "videos") {
     ytSection.style.display = "block";
@@ -239,28 +290,78 @@ fileType.addEventListener("change", () => {
   }
 });
 
-// ===== Generate YouTube thumbnail preview =====
+// Preview thumbnail for YouTube link
 youtubeLink.addEventListener("input", () => {
   const url = youtubeLink.value.trim();
-  if (url) {
-    try {
-      const urlObj = new URL(url);
-      const videoId = urlObj.searchParams.get("v");
-      if (videoId) {
-        ytThumbPreview.src = `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
-        ytThumbPreview.style.display = "block";
-      } else {
-        ytThumbPreview.style.display = "none";
-      }
-    } catch {
+  if (!url) { ytThumbPreview.style.display = "none"; return; }
+  try {
+    const urlObj = new URL(url);
+    const videoId = urlObj.searchParams.get("v");
+    if (videoId) {
+      ytThumbPreview.src = `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
+      ytThumbPreview.style.display = "block";
+    } else {
       ytThumbPreview.style.display = "none";
     }
-  } else {
+  } catch {
     ytThumbPreview.style.display = "none";
   }
 });
 
-// ===== Save Course Details =====
+// News image preview
+newsImageInput.addEventListener("change", () => {
+  const file = newsImageInput.files[0];
+  if (!file) { newsImagePreview.style.display = "none"; newsImagePreview.src = ""; return; }
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    newsImagePreview.src = e.target.result;
+    newsImagePreview.style.display = "block";
+  };
+  reader.readAsDataURL(file);
+});
+
+/* ===== Utilities ===== */
+
+/**
+ * linkify: converts plain text with urls, emails, phone numbers into HTML anchors.
+ * - http/https links => <a href>
+ * - emails => mailto:
+ * - phones => tel:
+ */
+function linkify(text) {
+  if (!text) return "";
+  // Escape HTML first
+  const escapeHtml = (s) => s.replace(/[&<>"']/g, m => ({
+    '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+  }[m]));
+  let out = escapeHtml(text);
+
+  // URLs (http/https)
+  out = out.replace(
+    /((https?:\/\/)[\w\-@:%._\+~#=\/?&;,()]+[\w\-@:%_\+~#=\/&;()])/gi,
+    (m) => `<a href="${m}" target="_blank" rel="noopener noreferrer">${m}</a>`
+  );
+
+  // emails
+  out = out.replace(
+    /([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6})/gi,
+    (m) => `<a href="mailto:${m}">${m}</a>`
+  );
+
+  // phone numbers (simple patterns: +234..., 0xxxxxxxxxx, 07...)
+  out = out.replace(
+    /(\+?\d{7,15}|\b0\d{9,12}\b)/g,
+    (m) => {
+      // Avoid replacing parts of URLs/emails (rudimentary check)
+      if (m.match(/mailto:|http|www\./i)) return m;
+      return `<a href="tel:${m}">${m}</a>`;
+    }
+  );
+
+  return out.replace(/\n/g, '<br/>');
+}
+
+/* ===== Course Save ===== */
 saveCourseBtn.addEventListener("click", async () => {
   const code = courseCodeInput.value.trim();
   const title = courseTitleInput.value.trim();
@@ -286,7 +387,7 @@ saveCourseBtn.addEventListener("click", async () => {
   }
 });
 
-// ===== Upload Files =====
+/* ===== Upload Files ===== */
 uploadBtn.addEventListener("click", async () => {
   const course = courseCodeInput.value.trim();
   if (!course) { alert("Enter course code!"); return; }
@@ -331,81 +432,109 @@ uploadBtn.addEventListener("click", async () => {
   }
 });
 
-// ===== News Image Preview =====
-newsImageInput.addEventListener("change", () => {
-  const file = newsImageInput.files[0];
-  if (file) {
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      newsImagePreview.src = e.target.result;
-      newsImagePreview.style.display = "block";
-    };
-    reader.readAsDataURL(file);
-  } else {
-    newsImagePreview.src = "";
-    newsImagePreview.style.display = "none";
-  }
-});
-
-// ===== Post Update / News =====
-document.getElementById("postNewsBtn").addEventListener("click", async () => {
-  const title = document.getElementById("newsTitle").value.trim();
-  const body = document.getElementById("newsBody").value.trim();
+/* ===== Post Update / News ===== */
+postNewsBtn.addEventListener("click", async () => {
+  const title = newsTitleInput.value.trim();
+  const body = newsBodyInput.value.trim();
   const imageFile = newsImageInput.files[0];
+  const category = newsCategoryInput.value.trim() || null;
 
   if (!title || !body) {
     alert("Please enter both title and body.");
     return;
   }
 
-  let imageUrl = null;
-
   try {
+    let imageUrl = null;
+
     if (imageFile) {
       const imgPath = `news/${Date.now()}_${imageFile.name}`;
       const { error: uploadError } = await supabaseClient.storage.from(BUCKET).upload(imgPath, imageFile, { upsert: true });
       if (uploadError) throw uploadError;
 
-      const { data: publicUrl } = supabaseClient.storage.from(BUCKET).getPublicUrl(imgPath);
-      imageUrl = publicUrl.publicUrl;
+      // getPublicUrl returns { data: { publicUrl } }
+      const { data: publicUrlData } = supabaseClient.storage.from(BUCKET).getPublicUrl(imgPath);
+      imageUrl = publicUrlData.publicUrl;
     }
 
-    const { error } = await supabaseClient.from("updates").insert([
-      { title: title, body: body, image: imageUrl }
-    ]);
-    if (error) throw error;
+    // Insert into updates table (title, body, image, category)
+    const { error: insertError, data: inserted } = await supabaseClient
+      .from("updates")
+      .insert([
+        { title: title, body: body, image: imageUrl, category: category }
+      ])
+      .select()
+      .single();
 
-    // Show success message
-    document.getElementById("newsSuccessMsg").style.display = "block";
-    setTimeout(() => document.getElementById("newsSuccessMsg").style.display = "none", 3000);
+    if (insertError) throw insertError;
+
+    // UI feedback
+    newsSuccessMsg.style.display = "block";
+    setTimeout(() => newsSuccessMsg.style.display = "none", 3000);
 
     // Clear inputs
-    document.getElementById("newsTitle").value = "";
-    document.getElementById("newsBody").value = "";
+    newsTitleInput.value = "";
+    newsBodyInput.value = "";
     newsImageInput.value = "";
     newsImagePreview.style.display = "none";
+    newsCategoryInput.value = "";
 
-    // Show live preview
-    const previewContainer = document.getElementById("newsPreviewContainer");
-    const postDiv = document.createElement("div");
-    postDiv.style.border = "1px solid #ccc";
-    postDiv.style.padding = "12px";
-    postDiv.style.borderRadius = "8px";
-    postDiv.style.marginBottom = "15px";
-    postDiv.innerHTML = `
-      <h3 style="margin-bottom:6px;">${title}</h3>
-      <p>${body}</p>
-      ${imageUrl ? `<img src="${imageUrl}" style="max-width:100%; border-radius:6px; margin-top:10px;">` : ""}
+    // Prepend preview (linkified)
+    const previewHTML = `
+      <div class="post-preview">
+        <h3>${escapeHtml(inserted.title)}</h3>
+        <div style="color:#444; margin-bottom:8px;">${linkify(inserted.body)}</div>
+        ${inserted.image ? `<img src="${inserted.image}" alt="update image">` : ""}
+        ${inserted.category ? `<div style="margin-top:8px; font-size:13px; color:#1f4fa6;"><strong>Category:</strong> ${escapeHtml(inserted.category)}</div>` : ""}
+        <div style="margin-top:8px; font-size:12px; color:#6b7aa3;">Just posted</div>
+      </div>
     `;
-    previewContainer.prepend(postDiv);
+    newsPreviewContainer.insertAdjacentHTML('afterbegin', previewHTML);
 
   } catch (err) {
     alert("Failed to post update: " + err.message);
     console.error(err);
   }
 });
+
+/* small escaper used in preview */
+function escapeHtml(s){ return (s||'').replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
+
+/* ===== OPTIONAL: fetch & show recent updates on admin page when loaded ===== */
+async function loadRecentUpdatesPreview(limit = 4) {
+  try {
+    const { data, error } = await supabaseClient
+      .from('updates')
+      .select('*')
+      .order('created_at', { ascending: false })
+      .limit(limit);
+
+    if (error) return;
+
+    // show as previews
+    newsPreviewContainer.innerHTML = '';
+    data.forEach(u => {
+      const itemHTML = `
+        <div class="post-preview" style="margin-bottom:12px;">
+          <h3>${escapeHtml(u.title)}</h3>
+          <div style="color:#444; margin-bottom:8px;">${linkify(u.body)}</div>
+          ${u.image ? `<img src="${u.image}" alt="image">` : ''}
+          ${u.category ? `<div style="margin-top:8px; font-size:13px; color:#1f4fa6;"><strong>Category:</strong> ${escapeHtml(u.category)}</div>` : ''}
+          <div style="margin-top:8px; font-size:12px; color:#6b7aa3;">${new Date(u.created_at).toLocaleString()}</div>
+        </div>
+      `;
+      newsPreviewContainer.insertAdjacentHTML('beforeend', itemHTML);
+    });
+  } catch (err) {
+    console.error('Failed to load recent updates preview:', err);
+  }
+}
+
+/* load previews on admin open */
+document.addEventListener('DOMContentLoaded', () => {
+  loadRecentUpdatesPreview();
+});
 </script>
 
 </body>
 </html>
-
