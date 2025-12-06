@@ -2,7 +2,7 @@
   "name": "👀3080 PDF ADMIN",
   "short_name": "3080PDFADMIN",
   "description": "Access all your UNIOSUN PDFs, videos, and updates in one place.",
-  "start_url": "pdf.html",
+  "start_url": "admin.html",
   "display": "standalone",
   "background_color": "#f5f7ff",
   "theme_color": "#003c94",
