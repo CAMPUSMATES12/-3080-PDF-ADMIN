@@ -1,544 +1,333 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
+<meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>👀3080 PDF Admin Panel</title>
+<title>Admin Panel | EYES OF 3080</title>
 
-<!-- Google Icons -->
-<link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
-
-<!-- PWA MANIFEST -->
-<link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#003c94">
-  
 <style>
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body {
-    font-family: Arial, sans-serif;
-    background: #f5f7fb;
-    color: #333;
-  }
+*{margin:0;padding:0;box-sizing:border-box}
+body{
+  font-family:Segoe UI,Tahoma,sans-serif;
+  background:#f4f6f5;
+  color:#222;
+}
+header{
+  background:linear-gradient(135deg,#2d5016,#4a7c2a);
+  color:#fff;
+}
+.header-container{
+  max-width:1200px;
+  margin:auto;
+  padding:16px 20px;
+  display:flex;
+  align-items:center;
+  gap:12px;
+}
+.logo-img{width:38px;height:38px}
+.logo-text{font-size:1.4rem;font-weight:bold}
 
-  header {
-    background: linear-gradient(to right, #003c94, #0056d2); /* royal blue */
-    color: white;
-    padding: 15px 20px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-  }
-  header h1 {
-    font-size: 24px;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-  }
-  header h1 img {
-    width: 40px;
-    height: 40px;
-    object-fit: contain;
-    border-radius: 6px;
-    background: rgba(255,255,255,0.06);
-  }
+.container{
+  max-width:1000px;
+  margin:30px auto;
+  padding:0 20px;
+}
+h1{margin-bottom:20px;color:#2d5016}
 
-  .container {
-    max-width: 980px;
-    margin: 28px auto;
-    background: white;
-    padding: 28px;
-    border-radius: 12px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.06);
-  }
+.section{
+  background:#fff;
+  padding:22px;
+  border-radius:14px;
+  margin-bottom:25px;
+  box-shadow:0 4px 14px rgba(0,0,0,.08);
+}
+.section h2{margin-bottom:15px;color:#2d5016}
 
-  h2 { color: #003c94; margin-bottom: 16px; }
+input,textarea,select{
+  width:100%;
+  padding:12px;
+  margin-bottom:12px;
+  border-radius:8px;
+  border:1px solid #ccc;
+}
+textarea{min-height:90px}
 
-  label {
-    display: block;
-    margin: 12px 0 6px;
-    font-weight: 700;
-    color: #1b3b6f;
-  }
-
-  input, select, textarea {
-    width: 100%;
-    padding: 12px;
-    margin-bottom: 14px;
-    border-radius: 8px;
-    border: 1px solid #d7e2fb;
-    font-size: 14px;
-    background: #fbfdff;
-  }
-
-  textarea {
-    resize: vertical;
-    min-height: 90px;
-  }
-
-  button {
-    background: linear-gradient(90deg,#0056d2,#0078ff);
-    color: white;
-    padding: 12px 20px;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    font-size: 15px;
-    transition: transform .12s ease, box-shadow .12s ease;
-  }
-  button:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 18px rgba(0,88,210,0.18);
-  }
-
-  .success-msg {
-    background: #e8f1ff;
-    border: 1px solid #0056d2;
-    padding: 12px;
-    border-radius: 8px;
-    margin-top: 12px;
-    color: #003c94;
-    display: none;
-    font-weight: 700;
-    text-align: center;
-  }
-
-  .note {
-    margin-top: 12px;
-    font-size: 13px;
-    color: #445d89;
-  }
-
-  /* Thumbnail preview styling */
-  #ytSection img, #newsImagePreview {
-    display: block;
-    margin-top: 10px;
-    width: 320px;
-    border-radius: 8px;
-    border: 1px solid #e6f0ff;
-  }
-
-  hr.separator {
-    border: none;
-    height: 1px;
-    background: linear-gradient(to right, rgba(0,0,0,0), rgba(0,0,0,0.06), rgba(0,0,0,0));
-    margin: 24px 0;
-  }
-
-  /* Live preview container */
-  #newsPreviewContainer .post-preview {
-    border-radius: 10px;
-    border: 1px solid #e6f0ff;
-    padding: 14px;
-    margin-top: 12px;
-    background: #fbfdff;
-  }
-  #newsPreviewContainer .post-preview h3 { color:#003c94; margin-bottom:8px; }
-  #newsPreviewContainer .post-preview img { max-width:100%; border-radius:8px; margin-top:10px; }
-
-  /* small helpers */
-  .inline-row { display:flex; gap:12px; flex-wrap:wrap; align-items:center; }
-  .inline-row .half { flex:1 1 48%; }
-  @media (max-width:720px){ .inline-row .half{ flex-basis:100%; } }
-
+button{
+  padding:10px 18px;
+  border:none;
+  border-radius:8px;
+  background:#2d5016;
+  color:#fff;
+  font-weight:600;
+  cursor:pointer;
+}
+button:hover{opacity:.9}
 </style>
 </head>
+
 <body>
 
 <header>
-  <h1>
-    <img src="https://vtpsruejncfykiazrfsx.supabase.co/storage/v1/object/public/PRODUCTS/EYES%20OF%203080%20logo" alt="Logo">
-    👀3080 PDF Admin Panel
-  </h1>
-  <div style="font-weight:700; color: #dbe9ff;">Admin</div>
+  <div class="header-container">
+    <img src="https://zvnovocoayqomdilidte.supabase.co/storage/v1/object/public/uploads/6a8f3e57-3d27-47f5-9b5e-22a7070fc442.jpeg" class="logo-img">
+    <span class="logo-text">EYES OF 3080 — Admin</span>
+  </div>
 </header>
 
 <div class="container">
-  <h2>Manage Course</h2>
+<h1>Dashboard</h1>
 
-  <!-- Course Details -->
-  <label for="courseCode">Course Code</label>
-  <input type="text" id="courseCode" placeholder="Example: CHM101">
-
-  <label for="courseTitle">Course Title</label>
-  <input type="text" id="courseTitleInput" placeholder="Example: Introduction to Chemistry">
-
-  <label for="courseDesc">Course Description</label>
-  <textarea id="courseDescInput" placeholder="Enter course description here..."></textarea>
-
-  <div style="display:flex; gap:12px; align-items:center;">
-    <button id="saveCourseBtn">Save Course Details</button>
-    <div class="success-msg" id="courseSuccessMsg">Course saved successfully!</div>
-  </div>
-
-  <hr class="separator">
-
-  <h2>Upload Course Files</h2>
-
-  <label for="fileType">File Type</label>
-  <select id="fileType">
-    <option value="pdfs">Course Documents</option>
-    <option value="notes">Course Notes</option>
-    <option value="videos">Course Videos (YouTube Links)</option>
-    <option value="resources">Course Resources</option>
-  </select>
-
-  <!-- YOUTUBE LINK INPUT (Hidden until selected) -->
-  <div id="ytSection" style="display:none; margin-top: 8px;">
-    <label for="videoTitle">YouTube Video Title</label>
-    <input type="text" id="videoTitle" placeholder="Enter video title, e.g., Introduction to Chemistry">
-
-    <label for="youtubeLink">YouTube Video Link</label>
-    <input type="url" id="youtubeLink" placeholder="Enter full YouTube link, e.g., https://www.youtube.com/watch?v=VIDEO_ID">
-
-    <small class="note">Make sure to enter the full YouTube URL. The thumbnail will be generated automatically.</small>
-
-    <!-- Thumbnail preview -->
-    <img id="ytThumbPreview" src="" alt="YouTube Thumbnail" style="display:none;">
-  </div>
-
-  <!-- NORMAL FILE INPUT -->
-  <label for="fileInput" id="fileLabel">Choose File</label>
-  <input type="file" id="fileInput">
-
-  <div style="display:flex; gap:12px; align-items:center;">
-    <button id="uploadBtn">Upload File</button>
-    <div class="success-msg" id="successMsg">File uploaded successfully!</div>
-  </div>
-
-  <hr class="separator">
-
-  <!-- ⭐⭐ UPDATED: POST UPDATES / NEWS SECTION ⭐⭐ -->
-  <h2>Post Updates / News</h2>
-
-  <label>Update Title</label>
-  <input type="text" id="newsTitle" placeholder="Enter title (short & clear)">
-
-  <label>Update Body (you can include links, emails, phone numbers)</label>
-  <textarea id="newsBody" placeholder="Write update content..."></textarea>
-
-  <div class="inline-row" style="margin-bottom:10px;">
-    <div class="half">
-      <label>Optional Image</label>
-      <input type="file" id="newsImage" accept="image/*">
-    </div>
-    <div class="half">
-      <label>Optional Category (e.g., General, 100-level)</label>
-      <input type="text" id="newsCategory" placeholder="e.g., General or 100-level">
-    </div>
-  </div>
-
-  <!-- Image preview -->
-  <img id="newsImagePreview" src="" alt="Preview" style="display:none; max-width:300px; margin-top:10px; border-radius:6px;">
-
-  <div style="display:flex; gap:12px; align-items:center; margin-top:10px;">
-    <button id="postNewsBtn">Post Update</button>
-    <div class="success-msg" id="newsSuccessMsg">Update posted successfully!</div>
-  </div>
-
-  <!-- Live preview of posted update -->
-  <div id="newsPreviewContainer" style="margin-top:20px;"></div>
+<!-- NEWS -->
+<div class="section">
+<h2>📰 Publish News</h2>
+<input id="newsTitle" placeholder="News title">
+<input type="file" id="newsImage" accept="image/*">
+<textarea id="newsContent" placeholder="News content"></textarea>
+<button onclick="uploadNews()">Publish</button>
 </div>
 
-<!-- SUPABASE JS -->
+<!-- PDF / COURSE FILES -->
+<div class="section">
+  <h2>📄 Upload Course PDF</h2>
+
+  <!-- Course code (admin types only this) -->
+<input
+  id="courseCode"
+  placeholder="Course Code (e.g BIO101)"
+  onblur="loadCourseDetails()"
+>
+
+<input
+  id="courseTitle"
+  placeholder="Course Title"
+>
+
+<select id="courseLevel">
+  <option value="">Select Level</option>
+  <option value="100">100 Level</option>
+  <option value="200">200 Level</option>
+  <option value="300">300 Level</option>
+  <option value="400">400 Level</option>
+  <option value="500">500 Level</option>
+</select>
+
+  <input
+    id="fileTitle"
+    placeholder="File Title (e.g Lecture Notes)"
+  >
+
+  <input
+    type="file"
+    id="pdfFile"
+    accept="application/pdf"
+  >
+
+  <button onclick="uploadCourseFile()">Upload PDF</button>
+</div>
+
+<!-- CBT -->
+<div class="section">
+<h2>🧠 Add CBT Question</h2>
+<input id="cbtCourse" placeholder="Course code">
+<textarea id="cbtQuestion" placeholder="Question"></textarea>
+<input id="optA" placeholder="Option A">
+<input id="optB" placeholder="Option B">
+<input id="optC" placeholder="Option C">
+<input id="optD" placeholder="Option D">
+<select id="cbtAnswer">
+<option value="A">A</option>
+<option value="B">B</option>
+<option value="C">C</option>
+<option value="D">D</option>
+</select>
+<button onclick="addCBT()">Add Question</button>
+</div>
+
+</div>
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
 <script>
-/* ===== CONFIG ===== */
-const SUPABASE_URL = "https://zvnovocoayqomdilidte.supabase.co";
-const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp2bm92b2NvYXlxb21kaWxpZHRlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQwMDM2OTgsImV4cCI6MjA3OTU3OTY5OH0.PcpwASQ3RBRoQVIglxKz-yM3iuYMZMtyQJBh8QNHad8";
-const BUCKET = "uploads";
+/* ================= SUPABASE ================= */
+const supabaseClient = supabase.createClient(
+  "https://zvnovocoayqomdilidte.supabase.co",
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp2bm92b2NvYXlxb21kaWxpZHRlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQwMDM2OTgsImV4cCI6MjA3OTU3OTY5OH0.PcpwASQ3RBRoQVIglxKz-yM3iuYMZMtyQJBh8QNHad8"
+);
 
-const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+/* ================= LOAD COURSE DETAILS ================= */
+async function loadCourseDetails() {
+  const code = document.getElementById("courseCode").value.trim().toUpperCase();
+  const titleInput = document.getElementById("courseTitle");
+  const levelSelect = document.getElementById("courseLevel");
 
-/* ===== ELEMENTS ===== */
-const uploadBtn = document.getElementById("uploadBtn");
-const fileType = document.getElementById("fileType");
-const fileInput = document.getElementById("fileInput");
-const fileLabel = document.getElementById("fileLabel");
-const successMsg = document.getElementById("successMsg");
+  if (!code) return;
 
-// Course fields
-const courseCodeInput = document.getElementById("courseCode");
-const courseTitleInput = document.getElementById("courseTitleInput");
-const courseDescInput = document.getElementById("courseDescInput");
-const saveCourseBtn = document.getElementById("saveCourseBtn");
-const courseSuccessMsg = document.getElementById("courseSuccessMsg");
+  const { data, error } = await supabaseClient
+    .from("courses")
+    .select("*")
+    .eq("course_code", code)
+    .single();
 
-// YouTube fields
-const ytSection = document.getElementById("ytSection");
-const videoTitle = document.getElementById("videoTitle");
-const youtubeLink = document.getElementById("youtubeLink");
-const ytThumbPreview = document.getElementById("ytThumbPreview");
-
-// News fields
-const newsImageInput = document.getElementById("newsImage");
-const newsImagePreview = document.getElementById("newsImagePreview");
-const newsTitleInput = document.getElementById("newsTitle");
-const newsBodyInput = document.getElementById("newsBody");
-const postNewsBtn = document.getElementById("postNewsBtn");
-const newsSuccessMsg = document.getElementById("newsSuccessMsg");
-const newsPreviewContainer = document.getElementById("newsPreviewContainer");
-const newsCategoryInput = document.getElementById("newsCategory");
-
-/* ===== UI Behavior ===== */
-fileType.addEventListener("change", () => {
-  if (fileType.value === "videos") {
-    ytSection.style.display = "block";
-    fileInput.style.display = "none";
-    fileLabel.style.display = "none";
+  if (data) {
+    // Course exists
+    titleInput.value = data.course_title;
+    levelSelect.value = data.level || "";
+    titleInput.readOnly = true;
+    levelSelect.disabled = true;
   } else {
-    ytSection.style.display = "none";
-    fileInput.style.display = "block";
-    fileLabel.style.display = "block";
-    ytThumbPreview.style.display = "none";
+    // New course
+    titleInput.value = "";
+    levelSelect.value = "";
+    titleInput.readOnly = false;
+    levelSelect.disabled = false;
   }
-});
-
-// Preview thumbnail for YouTube link
-youtubeLink.addEventListener("input", () => {
-  const url = youtubeLink.value.trim();
-  if (!url) { ytThumbPreview.style.display = "none"; return; }
-  try {
-    const urlObj = new URL(url);
-    const videoId = urlObj.searchParams.get("v");
-    if (videoId) {
-      ytThumbPreview.src = `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
-      ytThumbPreview.style.display = "block";
-    } else {
-      ytThumbPreview.style.display = "none";
-    }
-  } catch {
-    ytThumbPreview.style.display = "none";
-  }
-});
-
-// News image preview
-newsImageInput.addEventListener("change", () => {
-  const file = newsImageInput.files[0];
-  if (!file) { newsImagePreview.style.display = "none"; newsImagePreview.src = ""; return; }
-  const reader = new FileReader();
-  reader.onload = (e) => {
-    newsImagePreview.src = e.target.result;
-    newsImagePreview.style.display = "block";
-  };
-  reader.readAsDataURL(file);
-});
-
-/* ===== Utilities ===== */
-
-/**
- * linkify: converts plain text with urls, emails, phone numbers into HTML anchors.
- * - http/https links => <a href>
- * - emails => mailto:
- * - phones => tel:
- */
-function linkify(text) {
-  if (!text) return "";
-  // Escape HTML first
-  const escapeHtml = (s) => s.replace(/[&<>"']/g, m => ({
-    '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
-  }[m]));
-  let out = escapeHtml(text);
-
-  // URLs (http/https)
-  out = out.replace(
-    /((https?:\/\/)[\w\-@:%._\+~#=\/?&;,()]+[\w\-@:%_\+~#=\/&;()])/gi,
-    (m) => `<a href="${m}" target="_blank" rel="noopener noreferrer">${m}</a>`
-  );
-
-  // emails
-  out = out.replace(
-    /([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6})/gi,
-    (m) => `<a href="mailto:${m}">${m}</a>`
-  );
-
-  // phone numbers (simple patterns: +234..., 0xxxxxxxxxx, 07...)
-  out = out.replace(
-    /(\+?\d{7,15}|\b0\d{9,12}\b)/g,
-    (m) => {
-      // Avoid replacing parts of URLs/emails (rudimentary check)
-      if (m.match(/mailto:|http|www\./i)) return m;
-      return `<a href="tel:${m}">${m}</a>`;
-    }
-  );
-
-  return out.replace(/\n/g, '<br/>');
 }
 
-/* ===== Course Save ===== */
-saveCourseBtn.addEventListener("click", async () => {
-  const code = courseCodeInput.value.trim();
-  const title = courseTitleInput.value.trim();
-  const desc = courseDescInput.value.trim();
-
-  if (!code || !title || !desc) {
-    alert("Please fill in all course details!");
-    return;
-  }
-
+/* ================= UPLOAD COURSE FILE ================= */
+async function uploadCourseFile() {
   try {
-    const { error } = await supabaseClient
-      .from("courses")
-      .upsert([{ code: code, title: title, description: desc }], { onConflict: "code" });
+    const courseCode = document.getElementById("courseCode").value.trim().toUpperCase();
+    const courseTitle = document.getElementById("courseTitle").value.trim();
+    const fileTitle = document.getElementById("fileTitle").value.trim();
+    const file = document.getElementById("pdfFile").files[0];
 
-    if (error) throw error;
-
-    courseSuccessMsg.style.display = "block";
-    setTimeout(() => courseSuccessMsg.style.display = "none", 3000);
-  } catch (err) {
-    alert("Failed to save course: " + err.message);
-    console.error(err);
-  }
-});
-
-/* ===== Upload Files ===== */
-uploadBtn.addEventListener("click", async () => {
-  const course = courseCodeInput.value.trim();
-  if (!course) { alert("Enter course code!"); return; }
-
-  let path;
-  let uploadData;
-
-  if (fileType.value === "videos") {
-    if (!videoTitle.value.trim() || !youtubeLink.value.trim()) {
-      alert("Enter video title and YouTube link!");
+    if (!courseCode || !courseTitle || !fileTitle || !file) {
+      alert("Please fill all required fields");
       return;
     }
-    // Store YouTube link as TXT in Supabase
-    const blob = new Blob([youtubeLink.value.trim()], { type: "text/plain" });
-    path = `${course}/videos/${videoTitle.value}.txt`;
-    uploadData = blob;
-  } else {
-    const file = fileInput.files[0];
-    if (!file) { alert("Please select a file to upload!"); return; }
-    path = `${course}/${fileType.value}/${file.name}`;
-    uploadData = file;
-  }
 
-  try {
-    const { error } = await supabaseClient
-      .storage
-      .from(BUCKET)
-      .upload(path, uploadData, { upsert: true });
-
-    if (error) throw error;
-
-    successMsg.style.display = "block";
-    setTimeout(() => successMsg.style.display = "none", 3000);
-
-    fileInput.value = "";
-    videoTitle.value = "";
-    youtubeLink.value = "";
-    ytThumbPreview.style.display = "none";
-  } catch (err) {
-    alert("Upload failed: " + err.message);
-    console.error(err);
-  }
-});
-
-/* ===== Post Update / News ===== */
-postNewsBtn.addEventListener("click", async () => {
-  const title = newsTitleInput.value.trim();
-  const body = newsBodyInput.value.trim();
-  const imageFile = newsImageInput.files[0];
-  const category = newsCategoryInput.value.trim() || null;
-
-  if (!title || !body) {
-    alert("Please enter both title and body.");
-    return;
-  }
-
-  try {
-    let imageUrl = null;
-
-    if (imageFile) {
-      const imgPath = `news/${Date.now()}_${imageFile.name}`;
-      const { error: uploadError } = await supabaseClient.storage.from(BUCKET).upload(imgPath, imageFile, { upsert: true });
-      if (uploadError) throw uploadError;
-
-      // getPublicUrl returns { data: { publicUrl } }
-      const { data: publicUrlData } = supabaseClient.storage.from(BUCKET).getPublicUrl(imgPath);
-      imageUrl = publicUrlData.publicUrl;
-    }
-
-    // Insert into updates table (title, body, image, category)
-    const { error: insertError, data: inserted } = await supabaseClient
-      .from("updates")
-      .insert([
-        { title: title, body: body, image: imageUrl, category: category }
-      ])
+    // Upsert course using course_code as unique key
+    const { data: course, error: courseError } = await supabaseClient
+      .from("courses")
+      .upsert(
+        { course_code: courseCode, course_title: courseTitle },
+        { onConflict: 'course_code' }
+      )
       .select()
       .single();
 
-    if (insertError) throw insertError;
+    if (courseError) throw courseError;
 
-    // UI feedback
-    newsSuccessMsg.style.display = "block";
-    setTimeout(() => newsSuccessMsg.style.display = "none", 3000);
+    // Upload PDF to Supabase storage
+    const fileName = `courses/${course.course_code}/${Date.now()}-${file.name}`;
+    const { error: uploadError } = await supabaseClient
+      .storage
+      .from("uploads")
+      .upload(fileName, file);
 
-    // Clear inputs
-    newsTitleInput.value = "";
-    newsBodyInput.value = "";
-    newsImageInput.value = "";
-    newsImagePreview.style.display = "none";
-    newsCategoryInput.value = "";
+    if (uploadError) throw uploadError;
 
-    // Prepend preview (linkified)
-    const previewHTML = `
-      <div class="post-preview">
-        <h3>${escapeHtml(inserted.title)}</h3>
-        <div style="color:#444; margin-bottom:8px;">${linkify(inserted.body)}</div>
-        ${inserted.image ? `<img src="${inserted.image}" alt="update image">` : ""}
-        ${inserted.category ? `<div style="margin-top:8px; font-size:13px; color:#1f4fa6;"><strong>Category:</strong> ${escapeHtml(inserted.category)}</div>` : ""}
-        <div style="margin-top:8px; font-size:12px; color:#6b7aa3;">Just posted</div>
-      </div>
-    `;
-    newsPreviewContainer.insertAdjacentHTML('afterbegin', previewHTML);
+    const fileUrl = supabaseClient
+      .storage
+      .from("uploads")
+      .getPublicUrl(fileName).data.publicUrl;
+
+    // Save file record (without level)
+    const { error: saveError } = await supabaseClient
+      .from("course_files")
+      .insert({
+        course_code: course.course_code,
+        title: fileTitle,
+        file_url: fileUrl
+      });
+
+    if (saveError) throw saveError;
+
+    alert("✅ PDF uploaded successfully");
+
+    // Reset fields
+    document.getElementById("fileTitle").value = "";
+    document.getElementById("pdfFile").value = "";
 
   } catch (err) {
-    alert("Failed to post update: " + err.message);
     console.error(err);
-  }
-});
-
-/* small escaper used in preview */
-function escapeHtml(s){ return (s||'').replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
-
-/* ===== OPTIONAL: fetch & show recent updates on admin page when loaded ===== */
-async function loadRecentUpdatesPreview(limit = 4) {
-  try {
-    const { data, error } = await supabaseClient
-      .from('updates')
-      .select('*')
-      .order('created_at', { ascending: false })
-      .limit(limit);
-
-    if (error) return;
-
-    // show as previews
-    newsPreviewContainer.innerHTML = '';
-    data.forEach(u => {
-      const itemHTML = `
-        <div class="post-preview" style="margin-bottom:12px;">
-          <h3>${escapeHtml(u.title)}</h3>
-          <div style="color:#444; margin-bottom:8px;">${linkify(u.body)}</div>
-          ${u.image ? `<img src="${u.image}" alt="image">` : ''}
-          ${u.category ? `<div style="margin-top:8px; font-size:13px; color:#1f4fa6;"><strong>Category:</strong> ${escapeHtml(u.category)}</div>` : ''}
-          <div style="margin-top:8px; font-size:12px; color:#6b7aa3;">${new Date(u.created_at).toLocaleString()}</div>
-        </div>
-      `;
-      newsPreviewContainer.insertAdjacentHTML('beforeend', itemHTML);
-    });
-  } catch (err) {
-    console.error('Failed to load recent updates preview:', err);
+    alert("❌ PDF upload failed: " + err.message);
   }
 }
 
-/* load previews on admin open */
-document.addEventListener('DOMContentLoaded', () => {
-  loadRecentUpdatesPreview();
-});
-</script>
 
+/* ================= NEWS ================= */
+async function uploadNews() {
+  try {
+    const title = document.getElementById("newsTitle").value.trim();
+    const content = document.getElementById("newsContent").value.trim();
+    const image = document.getElementById("newsImage").files[0];
+
+    if (!title || !content) {
+      alert("Title and content are required");
+      return;
+    }
+
+    let imageUrl = null;
+
+    if (image) {
+      const fileName = `news/${Date.now()}-${image.name}`;
+      const { error } = await supabaseClient.storage.from("uploads").upload(fileName, image);
+      if (error) throw error;
+
+      imageUrl = supabaseClient.storage.from("uploads").getPublicUrl(fileName).data.publicUrl;
+    }
+
+    const { error } = await supabaseClient.from("posts").insert({
+      title,
+      content,
+      image_url: imageUrl
+    });
+
+    if (error) throw error;
+
+    alert("✅ News published successfully");
+
+    // Reset fields
+    document.getElementById("newsTitle").value = "";
+    document.getElementById("newsContent").value = "";
+    document.getElementById("newsImage").value = "";
+
+  } catch (err) {
+    console.error(err);
+    alert("❌ News upload failed: " + err.message);
+  }
+}
+
+/* ================= CBT ================= */
+async function addCBT() {
+  try {
+    const course = document.getElementById("cbtCourse").value.trim().toUpperCase();
+    const question = document.getElementById("cbtQuestion").value.trim();
+    const a = document.getElementById("optA").value.trim();
+    const b = document.getElementById("optB").value.trim();
+    const c = document.getElementById("optC").value.trim();
+    const d = document.getElementById("optD").value.trim();
+    const answer = document.getElementById("cbtAnswer").value;
+
+    if (!course || !question || !a || !b || !c || !d) {
+      alert("Fill all CBT fields");
+      return;
+    }
+
+    const { error } = await supabaseClient.from("cbt_questions").insert({
+      course,
+      question,
+      a, b, c, d,
+      answer
+    });
+
+    if (error) throw error;
+
+    alert("✅ CBT question added");
+
+    // Reset fields
+    document.getElementById("cbtCourse").value = "";
+    document.getElementById("cbtQuestion").value = "";
+    document.getElementById("optA").value = "";
+    document.getElementById("optB").value = "";
+    document.getElementById("optC").value = "";
+    document.getElementById("optD").value = "";
+
+  } catch (err) {
+    console.error(err);
+    alert("❌ CBT failed: " + err.message);
+  }
+}
+</script>
 </body>
 </html>
