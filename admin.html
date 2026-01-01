@@ -62,6 +62,13 @@ button{
   cursor:pointer;
 }
 button:hover{opacity:.9}
+
+link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#003c94">
+<link rel="apple-touch-icon" href="icons/icon-192x192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
 </style>
 </head>
 
@@ -79,7 +86,7 @@ button:hover{opacity:.9}
 
 <!-- NEWS -->
 <div class="section">
-<h2>📰 Publish News</h2>
+<h2>Publish News</h2>
 <input id="newsTitle" placeholder="News title">
 <input type="file" id="newsImage" accept="image/*">
 <textarea id="newsContent" placeholder="News content"></textarea>
@@ -88,7 +95,7 @@ button:hover{opacity:.9}
 
 <!-- PDF / COURSE FILES -->
 <div class="section">
-  <h2>📄 Upload Course PDF</h2>
+  <h2>Upload Course PDF</h2>
 
   <!-- Course code (admin types only this) -->
 <input
@@ -127,7 +134,7 @@ button:hover{opacity:.9}
 
 <!-- CBT -->
 <div class="section">
-<h2>🧠 Add CBT Question</h2>
+<h2> Add CBT Question</h2>
 <input id="cbtCourse" placeholder="Course code">
 <textarea id="cbtQuestion" placeholder="Question"></textarea>
 <input id="optA" placeholder="Option A">
